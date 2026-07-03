@@ -1,0 +1,44 @@
+name: Setup Toolchain
+description: Install DevOps CLI tools (Terraform, kubectl, helm, aws-cli)
+inputs:
+  terraform:
+    description: Terraform version
+    required: false
+    default: ""
+  kubectl:
+    description: kubectl version
+    required: false
+    default: ""
+  helm:
+    description: Helm version
+    required: false
+    default: ""
+  aws-cli:
+    description: Install AWS CLI
+    required: false
+    default: "false"
+runs:
+  using: composite
+  steps:
+    - uses: hashicorp/setup-terraform@v3
+      if: inputs.terraform != ''
+      with:
+        terraform_version: ${{ inputs.terraform }}
+
+    - uses: azure/setup-kubectl@v4
+      if: inputs.kubectl != ''
+      with:
+        version: ${{ inputs.kubectl }}
+
+    - uses: azure/setup-helm@v4
+      if: inputs.helm != ''
+      with:
+        version: ${{ inputs.helm }}
+
+    - name: Install AWS CLI
+      if: inputs.aws-cli == 'true'
+      shell: bash
+      run: |
+        curl -fsSL "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o awscliv2.zip
+        unzip -q awscliv2.zip
+        sudo ./aws/install
